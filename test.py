@@ -49,8 +49,9 @@ def login():
 def register():
     if request.method == "POST":
         name = request.form.get("name")
-        email = request.form["email"]
-        password = request.form["password"]
+        email = request.form.get("email")
+        password = request.form.get("password")
+        confirm = request.form.get("confirm")
 
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
@@ -60,6 +61,8 @@ def register():
             flash("Email already registered!", "warning")
         elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
             flash("Invalid email address!", "danger")
+        elif password != confirm:
+            flash("Passwords do not match!", "danger")
         else:
             hashed_password = generate_password_hash(password)
             cursor.execute(

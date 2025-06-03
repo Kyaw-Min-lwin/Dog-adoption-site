@@ -14,27 +14,63 @@
 <body>
 
     <!-- Stylish Dark Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm custom-navbar">
-        <div class="container">
-            <a class="navbar-brand fw-bold fs-3" href="#" style="letter-spacing: 1px;">
-                🐾 PawPortal
-            </a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('home') }}">PawPortal</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link nav-link-custom active" href="#">Home</a></li>
-                    <li class="nav-item"><a class="nav-link nav-link-custom" href="/volunteer">Volunteer</a></li>
-                    <li class="nav-item"><a class="nav-link nav-link-custom" href="/about">About</a></li>
-                    <li class="nav-item"><a class="nav-link nav-link-custom" href="/contact">Contact Us</a></li>
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="btn btn-glow ms-3 px-4" href="/login">Login / Register</a>
+                        <a class="nav-link" href="{{ url_for('home') }}">Home</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Volunteer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact Us</a>
+                    </li>
+                
+                    {% if session.get('loggedin') %}
+                    {% if session.get('role') == 'admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Dashboard</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="container mt-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
 
     <!-- Hero Section -->
     <section class="hero-section d-flex align-items-center">
