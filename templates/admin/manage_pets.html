@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Pets | PawPortal Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            background-color: #343a40;
+            height: 100vh;
+        }
+
+        .sidebar .nav-link {
+            color: #fff;
+        }
+
+        .sidebar .nav-link.active,
+        .sidebar .nav-link:hover {
+            background-color: #495057;
+            border-radius: 5px;
+        }
+
+        .table img {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar p-3" style="min-width: 220px; height: 100vh;">
+            <h4 class="text-center mb-4">🐾 PawPortal Admin</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('home') }}">Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white"
+                        href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('admin_manage_pets') }}">Manage
+                        Pets</a></li>
+                <!-- <li class="nav-item"><a class="nav-link text-white"
+                        href="{{ url_for('admin_manage_adoptions') }}">Adoption Requests</a></li> -->
+                <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-grow-1 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold">Manage Pets</h2>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addPetModal">+ Add New
+                    Pet</button>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Breed</th>
+                        <th>Species</th>
+                        <th>Age</th>
+                        <th>Status</th>
+                        <th colspan="2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pet in pets %}
+                    <tr>
+                        <td><img src="{{ pet.image_url }}" alt="{{ pet.name }}"></td>
+                        <td>{{ pet.name }}</td>
+                        <td>{{ pet.breed_name }}</td>
+                        <td>{{ pet.species_name }}</td>
+                        <td>{{pet.age}}</td>
+                        <td>{{ pet.status }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#editPetModal{{ pet.id }}">Edit</button>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" "><a href=" {{url_for('admin_delete_pet',
+                                pet_id=pet.id)}}" class='nav-link text-white'>Delete</a></button>
+                        </td>
+                    </tr>
+
+                    <!-- Edit Modal for each pet -->
+                    <div class=" modal fade" id="editPetModal{{ pet.id }}" tabindex="-1"
+                        aria-labelledby="editPetModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form action="{{ url_for('admin_edit_pet', pet_id=pet.id) }}" method="POST"
+                                    enctype="multipart/form-data">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Edit Pet</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Name</label>
+                                            <input type="text" name="name" class="form-control" value="{{ pet.name }}"
+                                                required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Pet Image</label>
+                                            <input type="file" name="image_file" class="form-control" accept="image/*">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Age</label>
+                                            <input type="number" name="age" class="form-control" value="{{ pet.age }}"
+                                                required min="1">
+                                            <div class="mb-3">
+                                                <label class="form-label">Description</label>
+                                                <textarea name="description" class="form-control"
+                                                    rows="3">{{ pet.description }}</textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Status</label>
+                                                <select name="status" class="form-select">
+                                                    <option value="Available" {% if pet.status=='Available' %}selected{%
+                                                        endif %}>Available</option>
+                                                    <option value="Adopted" {% if pet.status=='Adopted' %}selected{%
+                                                        endif %}>Adopted</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Save
+                                                Changes</button>
+                                        </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Add Modal -->
+            <div class="modal fade" id="addPetModal" tabindex="-1" aria-labelledby="addPetModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{{ url_for('admin_add_pet') }}" method="POST" enctype="multipart/form-data">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Add New Pet</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Name</label>
+                                    <input type="text" name="name" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Pet Image</label>
+                                    <input type="file" name="image_file" class="form-control" accept="image/*" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Description</label>
+                                    <textarea name="description" class="form-control" rows="3" required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Age</label>
+                                    <input type="number" name="age" class="form-control" required min="1">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Breed</label>
+                                    <select name="breed_id" class="form-select">
+                                        {% for breed in breed_list %}
+                                        <option value="{{ breed.id }}">{{ breed.name }}</option>
+                                        {% endfor %}
+
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Species</label>
+                                    <select name="species_id" class="form-select">
+                                        {% for species in species_list %}
+                                        <option value="{{ species[0] }}">{{ species[1] }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Status</label>
+                                    <select name="status" class="form-select">
+                                        <option value="Available">Available</option>
+                                        <option value="Adopted">Adopted</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-success">Add Pet</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

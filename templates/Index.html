@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
     <link rel="stylesheet" href="/static/css/styles.css" />
 </head>
 
@@ -27,7 +29,7 @@
                         <a class="nav-link" href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Volunteer</a>
+                        <a class="nav-link" href="{{url_for('volunteer')}}">Volunteer</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">About</a>
@@ -35,15 +37,16 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">Contact Us</a>
                     </li>
-                
+
                     {% if session.get('loggedin') %}
                     {% if session.get('role') == 'admin' %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Dashboard</a>
+                        <a class="nav-link" href="/admin/dashboard">Dashboard</a>
                     </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link text-danger" href="{{ url_for('logout') }}">Logout</a>
+                        <a class="nav-link text-danger" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i>
+                            Logout</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
@@ -92,77 +95,24 @@
         <div class="container">
             <h2 class="text-center mb-5 fw-bold">Meet Our Adorable Friends</h2>
             <div class="row g-4">
-                <!-- Pet Card -->
+                {% for pet in pets %}
                 <div class="col-md-4">
                     <div class="card pet-card shadow-sm">
-                        <img src="https://placedog.net/400" class="card-img-top" alt="Dog">
+                        <img src="{{ pet.image_url }}" class="card-img-top img-fluid" style="height: 200px; object-fit: cover;"
+                            alt="{{ pet.name }}">
                         <div class="card-body">
-                            <h5 class="card-title">Benny</h5>
-                            <p class="card-text">A gentle golden retriever who loves cuddles and long walks.</p>
-                            <a href="#" class="btn btn-sm btn-outline-warning w-100">Adopt Benny</a>
+                            <h5 class="card-title">{{ pet.name }}</h5>
+                            <p class="card-text">{{ pet.description }}</p>
+                            <a href="/adopt/{{ pet.id }}" class="btn btn-sm btn-outline-warning w-100">Adopt {{ pet.name
+                                }}</a>
                         </div>
                     </div>
                 </div>
-
-                <!-- Repeat with different pets -->
-                <div class="col-md-4">
-                    <div class="card pet-card shadow-sm">
-                        <img src="https://placedog.net/400/300" class="card-img-top" alt="Luna">
-                        <div class="card-body">
-                            <h5 class="card-title">Luna</h5>
-                            <p class="card-text">A curious tabby dog with a heart of gold and sparkling eyes.</p>
-                            <a href="#" class="btn btn-sm btn-outline-warning w-100">Adopt Luna</a>
-                        </div>
-                    </div>
+                {% endfor %}
                 </div>
-
-                <div class="col-md-4">
-                    <div class="card pet-card shadow-sm">
-                        <img src="https://placedog.net/401" class="card-img-top" alt="Dog">
-                        <div class="card-body">
-                            <h5 class="card-title">Max</h5>
-                            <p class="card-text">This energetic puppy is looking for someone to play fetch with!</p>
-                            <a href="#" class="btn btn-sm btn-outline-warning w-100">Adopt Max</a>
-                        </div>
-                    </div>
                 </div>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card pet-card shadow-sm">
-                        <img src="https://placedog.net/350/300" class="card-img-top" alt="Luna">
-                        <div class="card-body">
-                            <h5 class="card-title">Luna</h5>
-                            <p class="card-text">A curious tabby dog with a heart of gold and sparkling eyes.</p>
-                            <a href="#" class="btn btn-sm btn-outline-warning w-100">Adopt Luna</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="card pet-card shadow-sm">
-                        <img src="https://placedog.net/300/300" class="card-img-top" alt="Luna">
-                        <div class="card-body">
-                            <h5 class="card-title">Luna</h5>
-                            <p class="card-text">A curious tabby dog with a heart of gold and sparkling eyes.</p>
-                            <a href="#" class="btn btn-sm btn-outline-warning w-100">Adopt Luna</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="card pet-card shadow-sm">
-                        <img src="https://placedog.net/200/200" class="card-img-top" alt="Luna">
-                        <div class="card-body">
-                            <h5 class="card-title">Luna</h5>
-                            <p class="card-text">A curious tabby dog with a heart of gold and sparkling eyes.</p>
-                            <a href="#" class="btn btn-sm btn-outline-warning w-100">Adopt Luna</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </section>
+
 
     <section class="why-adopt py-5 text-white" style="background-color: #222;">
         <div class="container">

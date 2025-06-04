@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard | PawPortal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar p-3" style="min-width: 220px; height: 100vh;">
+            <h4 class="text-center mb-4">🐾 PawPortal Admin</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('home') }}">Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white"
+                        href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('admin_manage_pets') }}">Manage
+                        Pets</a></li>
+                <!-- <li class="nav-item"><a class="nav-link text-white"
+                        href="{{ url_for('admin_manage_adoptions') }}">Adoption Requests</a></li> -->
+                <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+
+
+
+        <!-- Main Content -->
+        <div class="flex-grow-1 p-4">
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+            <h2 class="mb-4 fw-bold">Welcome, Admin 🐶</h2>
+            <p class="text-muted">Here are your latest stats and activities on PawPortal.</p>
+
+            <!-- Statistics Cards -->
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card bg-primary text-white text-center">
+                        <div class="card-body">
+                            <h5>Total Pets</h5>
+                            <p class="fs-3 fw-bold">{{ total_pets }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-success text-white text-center">
+                        <div class="card-body">
+                            <h5>Available Pets</h5>
+                            <p class="fs-3 fw-bold">{{ available_pets }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-warning text-dark text-center">
+                        <div class="card-body">
+                            <h5>Pending Requests</h5>
+                            <p class="fs-3 fw-bold">{{ pending_requests }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="mt-5 chart-container">
+                <h5 class="mb-3">Adoptions Overview</h5>
+                <canvas id="adoptionChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="chart-data" data-total="{{ total_pets }}" data-available="{{ available_pets }}"
+        data-pending="{{ pending_requests }}">
+    </div>
+
+    <script>
+        const el = document.getElementById('chart-data');
+        const total = parseInt(el.dataset.total);
+        const available = parseInt(el.dataset.available);
+        const pending = parseInt(el.dataset.pending);
+        const adopted = total - available;
+
+        const ctx = document.getElementById('adoptionChart').getContext('2d');
+        const adoptionChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Total Pets', 'Available', 'Adopted', 'Pending Requests'],
+                datasets: [{
+                    label: 'Count',
+                    data: [total, available, adopted, pending],
+                    backgroundColor: [
+                        'rgba(13, 110, 253, 0.7)',
+                        'rgba(25, 135, 84, 0.7)',
+                        'rgba(220, 53, 69, 0.7)',
+                        'rgba(255, 193, 7, 0.7)'
+                    ],
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer - PawPortal</title>
+    <!-- Bootstrap CDN + Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .main-content {
+            padding: 2rem;
+        }
+
+        .custom-table th,
+        .custom-table td {
+            border: 2px solid #343a40;
+            padding: 10px;
+        }
+
+        .form-control {
+            margin-bottom: 1rem;
+        }
+
+        footer {
+            padding: 2rem 0;
+            background-color: #212529;
+            color: white;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Stylish Dark Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('home') }}">PawPortal</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('volunteer') }}">Volunteer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact Us</a>
+                    </li>
+
+                    {% if session.get('loggedin') %}
+                    {% if session.get('role') == 'admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="{{ url_for('logout') }}"><i
+                                class="bi bi-box-arrow-right"></i> Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container main-content">
+        <h2 class="mb-4 fw-bold text-center">Why Volunteer</h2>
+
+        <div class="mb-4">
+            <p>Volunteering with PawPortal is a meaningful way to help animals in need find loving homes. Volunteers
+                support
+                the organization by assisting with pet listings, promoting adoptable animals, helping at adoption
+                events, and
+                spreading awareness about responsible pet ownership. Their dedication plays a vital role in connecting
+                pets
+                with families and reducing shelter overcrowding.</p>
+
+            <p>It’s also a rewarding experience for anyone passionate about animal welfare. You’ll develop valuable
+                skills,
+                make a difference in your community, and see the joy of pets finding their forever homes.</p>
+        </div>
+
+        <h4 class="fw-semibold mb-3">Volunteer Requirements</h4>
+        <table class="table custom-table">
+            <thead class="table-dark">
+                <tr>
+                    <th>Requirement</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Must care about animals.</td>
+                </tr>
+                <tr>
+                    <td>Must be 18 years of age.</td>
+                </tr>
+                <tr>
+                    <td>Must be in good mental and physical health.</td>
+                </tr>
+                <tr>
+                    <td>Must provide a clean criminal background check.</td>
+                </tr>
+                <tr>
+                    <td>Must have a decent command of the English language.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr class="my-5">
+
+        <h3 class="mb-3 fw-bold">Become a Volunteer</h3>
+        <p>If you’re interested in becoming an Animal Rescue Volunteer in Thailand at PawPortal, please fill out the
+            form below:</p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+
+        <form method="POST" action="{{ url_for('volunteer') }}">
+            <div class="row">
+                <div class="col-md-6">
+                    <input type="text" class="form-control" name="first_name" placeholder="First Name" required>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" name="last_name" placeholder="Last Name" required>
+                </div>
+                <div class="col-md-6">
+                    <input type="email" class="form-control" name="email" placeholder="Email Address" required>
+                </div>
+                <div class="col-md-6">
+                    <input type="tel" class="form-control" name="phone" placeholder="Phone Number" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Submit</button>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 PawPortal. All rights reserved.</p>
+    </footer>
+
+    <!-- Bootstrap JS (for responsive navbar) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
