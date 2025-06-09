@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: pet-adoption-app
+    env: python
+    buildCommand: ""
+    startCommand: gunicorn main:app
+    envVars:
+      - key: DATABASE_URL
+        value: your-mysql-connection-url
