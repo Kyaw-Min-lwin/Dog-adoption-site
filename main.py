@@ -101,6 +101,11 @@ def logout():
         return redirect(url_for("login"))
 
 
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
+
+
 @app.route("/adopt/<int:pet_id>")
 def adopt(pet_id):
     if "loggedin" in session:
@@ -323,36 +328,40 @@ def internal_server_error(e):
 @app.route("/volunteer", methods=["GET", "POST"])
 def volunteer():
     if request.method == "POST":
-        # Get form data
-        first_name = request.form.get("first_name")
-        last_name = request.form.get("last_name")
-        email = request.form.get("email")
-        phone = request.form.get("phone")
+        if "loggedin" in session:
+            # Get form data
+            first_name = request.form.get("first_name")
+            last_name = request.form.get("last_name")
+            email = request.form.get("email")
+            phone = request.form.get("phone")
 
-        # Basic validation
-        if not all([first_name, last_name, email, phone]):
-            flash("All fields are required.", "danger")
+            # Basic validation
+            if not all([first_name, last_name, email, phone]):
+                flash("All fields are required.", "danger")
+                return redirect(url_for("volunteer"))
+
+            # email format validation
+            if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+                flash("Invalid email address.", "danger")
+                return redirect(url_for("volunteer"))
+
+            # phone number format validation (basic check)
+            if not re.match(r"^\+?[1-9]\d{1,14}$", phone):
+                flash("Invalid phone number.", "danger")
+                return redirect(url_for("volunteer"))
+            cursor = mysql.connection.cursor()
+            cursor.execute(
+                "INSERT INTO volunteers (first_name, last_name, email, phone) VALUES (%s, %s, %s, %s)",
+                (first_name, last_name, email, phone),
+            )
+            mysql.connection.commit()
+            cursor.close()
+
+            flash("Thank you for signing up as a volunteer!", "success")
             return redirect(url_for("volunteer"))
-
-        # email format validation
-        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            flash("Invalid email address.", "danger")
-            return redirect(url_for("volunteer"))
-
-        # phone number format validation (basic check)
-        if not re.match(r"^\+?[1-9]\d{1,14}$", phone):
-            flash("Invalid phone number.", "danger")
-            return redirect(url_for("volunteer"))
-        cursor = mysql.connection.cursor()
-        cursor.execute(
-            "INSERT INTO volunteers (first_name, last_name, email, phone) VALUES (%s, %s, %s, %s)",
-            (first_name, last_name, email, phone),
-        )
-        mysql.connection.commit()
-        cursor.close()
-
-        flash("Thank you for signing up as a volunteer!", "success")
-        return redirect(url_for("volunteer"))
+        else:
+            flash("You must be logged in to volunteer", "warning")
+            return redirect(url_for("login"))
 
     return render_template("volunteer.html")
 
